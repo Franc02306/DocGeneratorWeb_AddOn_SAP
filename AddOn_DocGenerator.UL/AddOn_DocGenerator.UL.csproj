@@ -41,14 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\ItemEventHandler.cs" />
     <Compile Include="Events\MenuEventHandler.cs" />
+    <Compile Include="Events\RightClickEventHandler.cs" />
     <Compile Include="Menus\MenuLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\FormClasses\UL_FrmMain.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Resources\Forms\FrmMain.srf" />
+    <Content Include="Resources\Forms\FrmMain.srf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Menus\Menu.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -16,16 +16,15 @@ namespace AddOn_DocGenerator
                 SapConnection.Connect();
 
                 new MenuLoader().Load();
+
                 new MenuEventHandler().Register();
+                new RightClickEventHandler().Register();
 
                 Application.Run();
             }
             catch (Exception ex)
             {
-                System.IO.File.WriteAllText(
-                    "AddOn_DocGenerator_Error.txt",
-                    ex.ToString()
-                );
+                System.IO.File.WriteAllText("AddOn_DocGenerator_Error.txt", ex.ToString());
             }
         }
     }
