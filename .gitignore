@@ -1,0 +1,66 @@
+﻿# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+
+# Rider / VSCode
+.idea/
+.vscode/
+
+# NuGet
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+*.temp
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# SAP B1
+*.b1p
+*.ard
+
+# Config sensibles
+App.config.user
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# SQL LocalDB
+*.mdf
+*.ldf
+
+# Publish
+publish/
+
+# IIS Express
+.vsconfig
+
+# Test Results
+TestResults/
+
+# Generated
+Generated\ Files/
+
+# Crystal Reports cache
+*.rptproj.user
+
+# AddOn output
+AddOn_DocGenerator_Error.txt

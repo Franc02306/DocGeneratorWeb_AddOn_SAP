@@ -1,0 +1,23 @@
+﻿<Application>
+	<Menus>
+		<action type="add">
+			<Menu Checked="0"
+				  Enabled="1"
+				  FatherUID="43520"
+				  Image=""
+				  Position="99"
+				  String="Doc Generator"
+				  Type="2"
+				  UniqueID="DOCGEN_MAIN" />
+
+			<Menu Checked="0"
+				  Enabled="1"
+				  FatherUID="DOCGEN_MAIN"
+				  Image=""
+				  Position="1"
+				  String="Generador de documentos"
+				  Type="1"
+				  UniqueID="DOCGEN_GENERATOR" />
+		</action>
+	</Menus>
+</Application>

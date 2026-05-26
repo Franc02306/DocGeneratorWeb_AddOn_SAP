@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AddOn_DocGenerator.BL/AddOn_DocGenerator.BL.csproj" Id="0cfedaa6-2e2d-4537-bb72-4de0297a9033" />
+  <Project Path="AddOn_DocGenerator.EL/AddOn_DocGenerator.EL.csproj" Id="e5872a28-0385-4406-82a0-25631120f464" />
+  <Project Path="AddOn_DocGenerator.SL/AddOn_DocGenerator.SL.csproj" Id="191bae8c-fcf0-4946-8a7d-5d6ecd4a26cc" />
+  <Project Path="AddOn_DocGenerator.UL/AddOn_DocGenerator.UL.csproj" Id="f98cf7f6-4b52-416e-b6d6-005771186f5f" />
+  <Project Path="AddOn_DocGenerator/AddOn_DocGenerator.csproj" Id="a119cc8f-7b88-490e-94c8-70e9b9efe1b9">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>
