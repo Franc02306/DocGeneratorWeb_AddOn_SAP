@@ -11,6 +11,12 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         public const string MATRIX_UID = "0_U_G";
         private const string COL_NUM = "#";
 
+        // CFL
+        private const string SUPPLIER_CFL_UID = "CFL_OCRD";
+
+        /// <summary>
+        /// Muestra el formulario principal del UDO si ya está abierto; de lo contrario, lo carga desde el archivo SRF.
+        /// </summary>
         public void Show()
         {
             var app = SapConnection.GetApplication();
@@ -28,6 +34,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             }
         }
 
+        /// <summary>
+        /// Carga el formulario principal desde el archivo SRF, inicializa la matrix y muestra el formulario.
+        /// </summary>
         private void LoadFormFromSrf()
         {
             var app = SapConnection.GetApplication();
@@ -48,8 +57,13 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             form.Visible = true;
         }
 
+        /// <summary>
+        /// Inicializa la matrix del formulario, asegurando que tenga al menos una fila y que sus líneas estén numeradas.
+        /// </summary>
         public static void InitMatrix(Form form)
         {
+            ConfigureSupplierChooseFromList(form);
+
             Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
 
             if (matrix.RowCount == 0)
@@ -62,6 +76,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             matrix.FlushToDataSource();
         }
 
+        /// <summary>
+        /// Renumera las filas de la matrix asignando el número de línea correspondiente a la columna de numeración.
+        /// </summary>
         private static void RenumberMatrix(Matrix matrix)
         {
             for (int i = 1; i <= matrix.RowCount; i++)
@@ -71,6 +88,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             }
         }
 
+        /// <summary>
+        /// Agrega una nueva fila a la matrix, renumera sus líneas y sincroniza los datos con el datasource.
+        /// </summary>
         public static void AddMatrixRow(Form form)
         {
             Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
@@ -82,6 +102,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             matrix.FlushToDataSource();
         }
 
+        /// <summary>
+        /// Elimina la fila seleccionada de la matrix, asegura que quede al menos una fila, renumera las líneas y sincroniza los datos con el datasource.
+        /// </summary>
         public static void DeleteSelectedMatrixRow(Form form)
         {
             Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
@@ -99,6 +122,26 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             RenumberMatrix(matrix);
 
             matrix.FlushToDataSource();
+        }
+
+        private static void ConfigureSupplierChooseFromList(Form form)
+        {
+            ChooseFromList supplierCfl = form.ChooseFromLists.Item(SUPPLIER_CFL_UID);
+
+            Conditions conditions = new Conditions();
+
+            Condition condition = conditions.Add();
+            condition.Alias = "CardType";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "S";
+            condition.Relationship = BoConditionRelationship.cr_AND;
+
+            condition = conditions.Add();
+            condition.Alias = "CardCode";
+            condition.Operation = BoConditionOperation.co_START;
+            condition.CondVal = "P";
+
+            supplierCfl.SetConditions(conditions);
         }
     }
 }
