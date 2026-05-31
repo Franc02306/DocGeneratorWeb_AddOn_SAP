@@ -8,6 +8,9 @@ namespace AddOn_DocGenerator.UL.Menus
 {
     public class MenuLoader
     {
+        /// <summary>
+        /// Carga el menú personalizado del AddOn desde el archivo XML y lo registra en SAP Business One.
+        /// </summary>
         public void Load()
         {
             try
@@ -29,19 +32,11 @@ namespace AddOn_DocGenerator.UL.Menus
 
                 app.LoadBatchActions(xml.InnerXml);
 
-                app.StatusBar.SetText(
-                    "Menú Doc Generator cargado correctamente.",
-                    BoMessageTime.bmt_Short,
-                    BoStatusBarMessageType.smt_Success
-                );
+                app.StatusBar.SetText("Menú Doc Generator cargado correctamente.", BoMessageTime.bmt_Short, BoStatusBarMessageType.smt_Success);
             }
             catch (Exception ex)
             {
-                SapConnection.GetApplication().StatusBar.SetText(
-                    $"Error cargando menú: {ex.Message}",
-                    BoMessageTime.bmt_Short,
-                    BoStatusBarMessageType.smt_Error
-                );
+                SapConnection.GetApplication().StatusBar.SetText($"Error cargando menú: {ex.Message}", BoMessageTime.bmt_Short, BoStatusBarMessageType.smt_Error);
             }
         }
     }

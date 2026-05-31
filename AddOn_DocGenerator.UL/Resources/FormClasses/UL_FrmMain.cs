@@ -124,6 +124,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             matrix.FlushToDataSource();
         }
 
+        /// <summary>
+        /// Configura el Choose From List de proveedores para mostrar únicamente socios de negocio tipo proveedor cuyo código empiece con "P".
+        /// </summary>
         private static void ConfigureSupplierChooseFromList(Form form)
         {
             ChooseFromList supplierCfl = form.ChooseFromLists.Item(SUPPLIER_CFL_UID);
