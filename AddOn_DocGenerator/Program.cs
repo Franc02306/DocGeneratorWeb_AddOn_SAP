@@ -19,6 +19,7 @@ namespace AddOn_DocGenerator
 
                 new MenuEventHandler().Register();
                 new RightClickEventHandler().Register();
+                new ItemEventHandler().Register();
 
                 Application.Run();
             }

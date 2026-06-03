@@ -7,12 +7,25 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
 {
     public class UL_FrmMain
     {
+        // MAIN
         public const string FORM_UID = "UDO_F_DG_DOC_GEN";
-        public const string MATRIX_UID = "0_U_G";
-        private const string COL_NUM = "#";
+        private const string DS_DETAIL = "@DG_DOC_DET";
 
         // CFL
         private const string SUPPLIER_CFL_UID = "CFL_OCRD";
+
+        // UID
+        private const string COL_NUM = "#";
+
+        public const string MATRIX_UID = "MtxDocs";
+        private const string COL_CARD_CODE = "ClmCodProv";
+        private const string COL_RUC = "ClmRucProv";
+        private const string COL_CARD_NAME = "ClmRazProv";
+
+        // CLM
+        private const string FIELD_CARD_CODE = "U_CARDCODE";
+        private const string FIELD_RUC = "U_RUC";
+        private const string FIELD_CARD_NAME = "U_CARDNAME";
 
         /// <summary>
         /// Muestra el formulario principal del UDO si ya está abierto; de lo contrario, lo carga desde el archivo SRF.
@@ -145,6 +158,91 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             condition.CondVal = "P";
 
             supplierCfl.SetConditions(conditions);
+        }
+
+        /// <summary>
+        /// Maneja los eventos del formulario principal derivados desde el manejador global de eventos.
+        /// </summary>
+        public static void HandleItemEvent(string formUid, ItemEvent eventInfo)
+        {
+            HandleSupplierChooseFromList(formUid, eventInfo);
+        }
+
+        /// <summary>
+        /// Maneja la selección del proveedor desde el Choose From List y completa RUC y razón social en la matrix.
+        /// </summary>
+        private static void HandleSupplierChooseFromList(string formUid, ItemEvent eventInfo)
+        {
+            if (formUid != FORM_UID)
+                return;
+
+            if (eventInfo.EventType != BoEventTypes.et_CHOOSE_FROM_LIST)
+                return;
+
+            if (eventInfo.BeforeAction)
+                return;
+
+            if (eventInfo.ItemUID != MATRIX_UID)
+                return;
+
+            if (eventInfo.ColUID != COL_CARD_CODE)
+                return;
+
+            if (eventInfo.Row <= 0)
+                return;
+
+            IChooseFromListEvent chooseFromListEvent = (IChooseFromListEvent)eventInfo;
+
+            if (chooseFromListEvent.ChooseFromListUID != SUPPLIER_CFL_UID)
+                return;
+
+            DataTable selectedObjects = chooseFromListEvent.SelectedObjects;
+
+            if (selectedObjects == null || selectedObjects.Rows.Count == 0)
+                return;
+
+            string cardCode = GetDataTableValue(selectedObjects, "CardCode");
+            string ruc = GetDataTableValue(selectedObjects, "LicTradNum");
+            string cardName = GetDataTableValue(selectedObjects, "CardName");
+
+            Application app = SapConnection.GetApplication();
+            Form form = app.Forms.Item(formUid);
+
+            try
+            {
+                form.Freeze(true);
+
+                Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
+                DBDataSource detailDataSource = form.DataSources.DBDataSources.Item(DS_DETAIL);
+
+                matrix.FlushToDataSource();
+
+                int dataSourceRow = eventInfo.Row - 1;
+
+                detailDataSource.SetValue(FIELD_CARD_CODE, dataSourceRow, cardCode);
+                detailDataSource.SetValue(FIELD_RUC, dataSourceRow, ruc);
+                detailDataSource.SetValue(FIELD_CARD_NAME, dataSourceRow, cardName);
+
+                matrix.LoadFromDataSource();
+
+                RenumberMatrix(matrix);
+
+                matrix.FlushToDataSource();
+            }
+            finally
+            {
+                form.Freeze(false);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene un valor seguro desde el DataTable retornado por el Choose From List.
+        /// </summary>
+        private static string GetDataTableValue(DataTable dataTable, string columnName)
+        {
+            object value = dataTable.GetValue(columnName, 0);
+
+            return value == null ? string.Empty : value.ToString();
         }
     }
 }
