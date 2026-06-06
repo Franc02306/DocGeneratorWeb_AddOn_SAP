@@ -46,7 +46,7 @@ namespace AddOn_DocGenerator.SL
                         throw new Exception("No se pudo obtener la aplicación SAP Business One.");
 
                     SBOApplication.StatusBar.SetText(
-                        "Conexión exitosa.",
+                        "AddOn DocGenerator conectado.",
                         BoMessageTime.bmt_Short,
                         BoStatusBarMessageType.smt_Success
                     );

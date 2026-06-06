@@ -14,7 +14,11 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         private const string DS_DETAIL = "@DG_DOC_DET";
 
         // CFL
-        private const string SUPPLIER_CFL_UID = "CFL_OCRD";
+        private const string CRD_CFL_UID = "CFL_OCRD";
+        private const string PRJ_CFL_UID = "CFL_OPRJ";
+        private const string WHS_CFL_UID = "CFL_OWHS";
+        private const string PRC_CFL_UID = "CFL_OPRC";
+        private const string ITM_CFL_UID = "CFL_OITM";
 
         // UID
         private const string COL_NUM = "#";
@@ -84,6 +88,8 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         public static void InitMatrix(Form form)
         {
             ConfigureSupplierChooseFromList(form);
+            ConfigureProjectChooseFromList(form);
+            ConfigureWarehouseChooseFromList(form);
 
             Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
 
@@ -180,11 +186,11 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         }
 
         /// <summary>
-        /// Configura el Choose From List de proveedores para mostrar únicamente socios de negocio tipo proveedor cuyo código empiece con "P".
+        /// Configura el CFL de proveedores para mostrar únicamente socios de negocio tipo proveedor cuyo código empiece con "P".
         /// </summary>
         private static void ConfigureSupplierChooseFromList(Form form)
         {
-            ChooseFromList supplierCfl = form.ChooseFromLists.Item(SUPPLIER_CFL_UID);
+            ChooseFromList supplierCfl = form.ChooseFromLists.Item(CRD_CFL_UID);
 
             Conditions conditions = new Conditions();
 
@@ -198,8 +204,77 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             condition.Alias = "CardCode";
             condition.Operation = BoConditionOperation.co_START;
             condition.CondVal = "P";
+            condition.Relationship = BoConditionRelationship.cr_AND;
+
+            condition = conditions.Add();
+            condition.Alias = "validFor";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "Y";
+            condition.Relationship = BoConditionRelationship.cr_AND;
+
+            condition = conditions.Add();
+            condition.Alias = "frozenFor";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "N";
 
             supplierCfl.SetConditions(conditions);
+        }
+
+        /// <summary>
+        /// Configura el CFL de proyectos para mostrar únicamente los proyectos activos.
+        /// </summary>
+        private static void ConfigureProjectChooseFromList(Form form)
+        {
+            ChooseFromList projectCfl = form.ChooseFromLists.Item(PRJ_CFL_UID);
+
+            Conditions conditions = new Conditions();
+
+            Condition condition = conditions.Add();
+            condition.Alias = "Active";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "Y";
+
+            projectCfl.SetConditions(conditions);
+        }
+
+        /// <summary>
+        /// Configura el CFL de almacénes para mostrar únicamente los almacénes activos.
+        /// </summary>
+        private static void ConfigureWarehouseChooseFromList(Form form)
+        {
+            ChooseFromList warehouseCfl = form.ChooseFromLists.Item(WHS_CFL_UID);
+
+            Conditions conditions = new Conditions();
+
+            Condition condition = conditions.Add();
+            condition.Alias = "Inactive";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "N";
+
+            warehouseCfl.SetConditions(conditions);
+        }
+
+        /// <summary>
+        /// Configura el CFL de centros de costo para mostrar únicamente los centros de costo activos.
+        /// </summary>
+        private static void ConfigureCostCenterChooseFromList(Form form, string dimensionCode)
+        {
+            ChooseFromList costCenterCfl = form.ChooseFromLists.Item(PRC_CFL_UID);
+
+            Conditions conditions = new Conditions();
+
+            Condition condition = conditions.Add();
+            condition.Alias = "Active";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = "Y";
+            condition.Relationship = BoConditionRelationship.cr_AND;
+
+            condition = conditions.Add();
+            condition.Alias = "DimCode";
+            condition.Operation = BoConditionOperation.co_EQUAL;
+            condition.CondVal = dimensionCode;
+
+            costCenterCfl.SetConditions(conditions);
         }
 
         /// <summary>
@@ -207,11 +282,66 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         /// </summary>
         public static void HandleItemEvent(string formUid, ItemEvent eventInfo)
         {
+            ConfigureCostCenterChooseFromListBeforeOpen(formUid, eventInfo);
             HandleSupplierChooseFromList(formUid, eventInfo);
         }
 
         /// <summary>
-        /// Maneja la selección del proveedor desde el Choose From List y completa RUC y razón social en la matrix.
+        /// Gestión de CFL para consultar centros de costo según dimensión enviada
+        /// </summary>
+        private static void ConfigureCostCenterChooseFromListBeforeOpen(string formUid, ItemEvent eventInfo)
+        {
+            if (formUid != FORM_UID)
+                return;
+
+            if (eventInfo.EventType != BoEventTypes.et_CHOOSE_FROM_LIST)
+                return;
+
+            if (!eventInfo.BeforeAction)
+                return;
+
+            if (eventInfo.ItemUID != MATRIX_UID)
+                return;
+
+            if (eventInfo.Row <= 0)
+                return;
+
+            string dimensionCode = string.Empty;
+
+            switch (eventInfo.ColUID)
+            {
+                case "ClmCeCo1":
+                    dimensionCode = "1";
+                    break;
+
+                case "ClmCeCo2":
+                    dimensionCode = "2";
+                    break;
+
+                case "ClmCeCo3":
+                    dimensionCode = "3";
+                    break;
+
+                case "ClmCeCo4":
+                    dimensionCode = "4";
+                    break;
+
+                case "ClmCeCo5":
+                    dimensionCode = "5";
+                    break;
+
+                default:
+                    return;
+            }
+
+            Application app = SapConnection.GetApplication();
+            Form form = app.Forms.Item(formUid);
+
+            ConfigureCostCenterChooseFromList(form, dimensionCode);
+        }
+
+        /// <summary>
+        /// Maneja la selección del proveedor desde el CFL y completa RUC y razón social en la matrix.
         /// </summary>
         private static void HandleSupplierChooseFromList(string formUid, ItemEvent eventInfo)
         {
@@ -235,7 +365,7 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
 
             IChooseFromListEvent chooseFromListEvent = (IChooseFromListEvent)eventInfo;
 
-            if (chooseFromListEvent.ChooseFromListUID != SUPPLIER_CFL_UID)
+            if (chooseFromListEvent.ChooseFromListUID != CRD_CFL_UID)
                 return;
 
             DataTable selectedObjects = chooseFromListEvent.SelectedObjects;
@@ -278,7 +408,7 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         }
 
         /// <summary>
-        /// Obtiene un valor seguro desde el DataTable retornado por el Choose From List.
+        /// Obtiene un valor seguro desde el DataTable retornado por el CFL.
         /// </summary>
         private static string GetDataTableValue(DataTable dataTable, string columnName)
         {
