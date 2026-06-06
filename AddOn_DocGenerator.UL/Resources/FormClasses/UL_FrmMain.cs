@@ -18,9 +18,9 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         private const string COL_NUM = "#";
 
         public const string MATRIX_UID = "MtxDocs";
-        private const string COL_CARD_CODE = "ClmCodProv";
-        private const string COL_RUC = "ClmRucProv";
-        private const string COL_CARD_NAME = "ClmRazProv";
+        private const string COL_CARD_CODE = "ClmCodPrv";
+        private const string COL_RUC = "ClmRucPrv";
+        private const string COL_CARD_NAME = "ClmRznPrv";
 
         // CLM
         private const string FIELD_CARD_CODE = "U_CARDCODE";
