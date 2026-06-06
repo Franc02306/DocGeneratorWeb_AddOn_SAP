@@ -7,6 +7,8 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
 {
     public class UL_FrmMain
     {
+        #region DEFINICIÓN DE VARIABLES DE FORMULARIO
+
         // MAIN
         public const string FORM_UID = "UDO_F_DG_DOC_GEN";
         private const string DS_DETAIL = "@DG_DOC_DET";
@@ -26,6 +28,12 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         private const string FIELD_CARD_CODE = "U_CARDCODE";
         private const string FIELD_RUC = "U_RUC";
         private const string FIELD_CARD_NAME = "U_CARDNAME";
+        private const string FIELD_TAX_DATE = "U_TAXDATE";
+        private const string FIELD_DOC_DATE = "U_DOCDATE";
+        private const string FIELD_DUE_DATE = "U_DUEDATE";
+        private const string FIELD_CURRENCY = "U_CURRENCY";
+
+        #endregion
 
         /// <summary>
         /// Muestra el formulario principal del UDO si ya está abierto; de lo contrario, lo carga desde el archivo SRF.
@@ -84,9 +92,43 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
                 matrix.AddRow(1);
             }
 
+            SetDefaultValuesForCreateMode(form, matrix);
+
             RenumberMatrix(matrix);
 
             matrix.FlushToDataSource();
+        }
+
+        /// <summary>
+        /// Setear data por defecto en la matrix, sólo en MODO CREAR
+        /// </summary>
+        private static void SetDefaultValuesForCreateMode(Form form, Matrix matrix)
+        {
+            if (form.Mode != BoFormMode.fm_ADD_MODE)
+                return;
+
+            DBDataSource detailDataSource = form.DataSources.DBDataSources.Item(DS_DETAIL);
+
+            matrix.FlushToDataSource();
+
+            string today = DateTime.Now.ToString("yyyyMMdd");
+
+            for (int i = 0; i < detailDataSource.Size; i++)
+            {
+                if (string.IsNullOrWhiteSpace(detailDataSource.GetValue(FIELD_TAX_DATE, i)))
+                    detailDataSource.SetValue(FIELD_TAX_DATE, i, today);
+
+                if (string.IsNullOrWhiteSpace(detailDataSource.GetValue(FIELD_DOC_DATE, i)))
+                    detailDataSource.SetValue(FIELD_DOC_DATE, i, today);
+
+                if (string.IsNullOrWhiteSpace(detailDataSource.GetValue(FIELD_DUE_DATE, i)))
+                    detailDataSource.SetValue(FIELD_DUE_DATE, i, today);
+
+                if (string.IsNullOrWhiteSpace(detailDataSource.GetValue(FIELD_CURRENCY, i)))
+                    detailDataSource.SetValue(FIELD_CURRENCY, i, "SOL");
+            }
+
+            matrix.LoadFromDataSource();
         }
 
         /// <summary>
