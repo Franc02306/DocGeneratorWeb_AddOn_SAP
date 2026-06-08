@@ -17,18 +17,26 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         private const string CRD_CFL_UID = "CFL_OCRD";
         private const string PRJ_CFL_UID = "CFL_OPRJ";
         private const string WHS_CFL_UID = "CFL_OWHS";
-        private const string PRC_CFL_UID = "CFL_OPRC";
+        private const string PRC_CFL_UID_1 = "CFL_OPRC1"; // Dimensión 1
+        private const string PRC_CFL_UID_2 = "CFL_OPRC2"; // Dimensión 2
+        private const string PRC_CFL_UID_3 = "CFL_OPRC3"; // Dimensión 3
+        private const string PRC_CFL_UID_4 = "CFL_OPRC4"; // Dimensión 4
+        private const string PRC_CFL_UID_5 = "CFL_OPRC5"; // Dimensión 5
         private const string ITM_CFL_UID = "CFL_OITM";
 
-        // UID
-        private const string COL_NUM = "#";
-
+        // COL
         public const string MATRIX_UID = "MtxDocs";
+        private const string COL_NUM = "#";
         private const string COL_CARD_CODE = "ClmCodPrv";
         private const string COL_RUC = "ClmRucPrv";
         private const string COL_CARD_NAME = "ClmRznPrv";
+        private const string COL_DIM1 = "ClmDim1";
+        private const string COL_DIM2 = "ClmDim2";
+        private const string COL_DIM3 = "ClmDim3";
+        private const string COL_DIM4 = "ClmDim4";
+        private const string COL_DIM5 = "ClmDim5";
 
-        // CLM
+        // FIELD
         private const string FIELD_CARD_CODE = "U_CARDCODE";
         private const string FIELD_RUC = "U_RUC";
         private const string FIELD_CARD_NAME = "U_CARDNAME";
@@ -259,7 +267,7 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         /// </summary>
         private static void ConfigureCostCenterChooseFromList(Form form, string dimensionCode)
         {
-            ChooseFromList costCenterCfl = form.ChooseFromLists.Item(PRC_CFL_UID);
+            ChooseFromList costCenterCfl = form.ChooseFromLists.Item(PRC_CFL_UID_1);
 
             Conditions conditions = new Conditions();
 
@@ -306,27 +314,27 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             if (eventInfo.Row <= 0)
                 return;
 
-            string dimensionCode = string.Empty;
+            string dimensionCode;
 
             switch (eventInfo.ColUID)
             {
-                case "ClmCeCo1":
+                case COL_DIM1:
                     dimensionCode = "1";
                     break;
 
-                case "ClmCeCo2":
+                case COL_DIM2:
                     dimensionCode = "2";
                     break;
 
-                case "ClmCeCo3":
+                case COL_DIM3:
                     dimensionCode = "3";
                     break;
 
-                case "ClmCeCo4":
+                case COL_DIM4:
                     dimensionCode = "4";
                     break;
 
-                case "ClmCeCo5":
+                case COL_DIM5:
                     dimensionCode = "5";
                     break;
 
