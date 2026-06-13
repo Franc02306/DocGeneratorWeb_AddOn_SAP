@@ -292,6 +292,7 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
         {
             ConfigureCostCenterChooseFromListBeforeOpen(formUid, eventInfo);
             HandleSupplierChooseFromList(formUid, eventInfo);
+            HandleCostCenterChooseFromList(formUid, eventInfo);
         }
 
         /// <summary>
@@ -413,6 +414,79 @@ namespace AddOn_DocGenerator.UL.Resources.FormClasses
             {
                 form.Freeze(false);
             }
+        }
+
+        private static void HandleCostCenterChooseFromList(string formUid, ItemEvent eventInfo)
+        {
+            if (formUid != FORM_UID)
+                return;
+
+            if (eventInfo.EventType != BoEventTypes.et_CHOOSE_FROM_LIST)
+                return;
+
+            if (eventInfo.BeforeAction)
+                return;
+
+            if (eventInfo.ItemUID != MATRIX_UID)
+                return;
+
+            if (eventInfo.Row <= 0)
+                return;
+
+            string fieldName;
+
+            switch (eventInfo.ColUID)
+            {
+                case COL_DIM1:
+                    fieldName = "U_DIM1";
+                    break;
+
+                case COL_DIM2:
+                    fieldName = "U_DIM2";
+                    break;
+
+                case COL_DIM3:
+                    fieldName = "U_DIM3";
+                    break;
+
+                case COL_DIM4:
+                    fieldName = "U_DIM4";
+                    break;
+
+                case COL_DIM5:
+                    fieldName = "U_DIM5";
+                    break;
+
+                default:
+                    return;
+            }
+
+            IChooseFromListEvent chooseFromListEvent = (IChooseFromListEvent)eventInfo;
+
+            DataTable selectedObjects = chooseFromListEvent.SelectedObjects;
+
+            if (selectedObjects == null || selectedObjects.Rows.Count == 0)
+                return;
+
+            string prcCode = GetDataTableValue(selectedObjects, "PrcCode");
+
+            Application app = SapConnection.GetApplication();
+            Form form = app.Forms.Item(formUid);
+
+            Matrix matrix = (Matrix)form.Items.Item(MATRIX_UID).Specific;
+            DBDataSource detailDataSource = form.DataSources.DBDataSources.Item(DS_DETAIL);
+
+            matrix.FlushToDataSource();
+
+            int dataSourceRow = eventInfo.Row - 1;
+
+            detailDataSource.SetValue(fieldName, dataSourceRow, prcCode);
+
+            matrix.LoadFromDataSource();
+
+            RenumberMatrix(matrix);
+
+            matrix.FlushToDataSource();
         }
 
         /// <summary>
